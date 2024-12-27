@@ -2,3 +2,5 @@
 ![](https://img.shields.io/badge/android-21%2B-brightgreen?logo=android)
 ![](https://img.shields.io/badge/jitpack-release-green?logo=jitpack)
 [![](https://jitpack.io/v/catchpig/AndroidUVCCamera.svg)](https://jitpack.io/#catchpig/AndroidUVCCamera)
+![GitHub forks](https://img.shields.io/github/forks/catchpig/AndroidUVCCamera)
+![GitHub Repo stars](https://img.shields.io/github/stars/catchpig/AndroidUVCCamera)
