@@ -24,6 +24,7 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
 
     private CameraHelper mCameraHelper;
     private UsbDevice mUsbDevice;
+    private boolean mCameraOpened = false;
     private OnUsbCameraSelectedListener mOnUsbCameraSelectedListener;
     private IImageCapture.OnImageCaptureCallback mOnImageCaptureCallback;
 
@@ -76,7 +77,7 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
         return getCameraHelper().getDeviceList();
     }
 
-    private CameraHelper getCameraHelper() {
+    public CameraHelper getCameraHelper() {
         if (mCameraHelper == null) {
             mCameraHelper = new CameraHelper();
             mCameraHelper.setStateCallback(this);
@@ -112,8 +113,15 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
 
     }
 
+    public void closeCamera() {
+        if (mCameraOpened) {
+            getCameraHelper().closeCamera();
+        }
+    }
+
     public void selectDevice(UsbDevice device) {
         mUsbDevice = device;
+        mCameraOpened = false;
         getCameraHelper().selectDevice(device);
     }
 
@@ -144,6 +152,7 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
         if (surfaceTexture != null) {
             cameraHelper.addSurface(surfaceTexture, false);
         }
+        mCameraOpened = false;
     }
 
     @Override
@@ -152,6 +161,7 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
         if (surfaceTexture != null) {
             getCameraHelper().addSurface(surfaceTexture, false);
         }
+        mCameraOpened = false;
     }
 
     @Override
