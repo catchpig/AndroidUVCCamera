@@ -152,7 +152,7 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
         if (surfaceTexture != null) {
             cameraHelper.addSurface(surfaceTexture, false);
         }
-        mCameraOpened = false;
+        mCameraOpened = true;
     }
 
     @Override
