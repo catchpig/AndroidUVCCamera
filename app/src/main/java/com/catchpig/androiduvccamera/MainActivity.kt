@@ -1,11 +1,9 @@
 package com.catchpig.androiduvccamera
 
-import android.hardware.usb.UsbDevice
 import android.os.Bundle
 import com.catchpig.androiduvccamera.databinding.ActivityMainBinding
 import com.catchpig.mvvm.base.activity.BaseActivity
 import com.catchpig.utils.ext.logi
-import com.catchpig.widget.CameraView.OnUsbCameraSelectedListener
 import com.herohan.uvcapp.IImageCapture
 import com.herohan.uvcapp.IImageCapture.OnImageCaptureCallback
 import com.hjq.permissions.Permission
@@ -13,7 +11,7 @@ import com.hjq.permissions.XXPermissions
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), OnUsbCameraSelectedListener,
+class MainActivity : BaseActivity<ActivityMainBinding>(),
     OnImageCaptureCallback {
     companion object {
         private const val TAG = "MainActivity"
@@ -22,19 +20,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), OnUsbCameraSelectedLis
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bodyBinding {
-            camera.setOnUsbCameraSelectedListener(this@MainActivity)
-            camera.setOnImageCaptureCallback(this@MainActivity)
+            camera1.setOnImageCaptureCallback(this@MainActivity)
             XXPermissions.with(this@MainActivity)
                 .permission(Permission.CAMERA)
                 .permission(Permission.WRITE_EXTERNAL_STORAGE)
                 .request { permissions, allGranted ->
                     if (allGranted) {
-                        camera.setupCamera()
+                        camera1.initCamera()
+                        camera1.postDelayed({
+                            camera2.initCamera()
+                        }, 5000)
                     }
                 }
             takePicture.setOnClickListener {
                 takePicture()
             }
+
         }
 
     }
@@ -42,23 +43,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), OnUsbCameraSelectedLis
     private fun takePicture() {
         val name = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
             .format(System.currentTimeMillis())
-        bodyBinding.camera.takePicture("aiImages", name)
-    }
-
-
-    override fun onSelected(device: UsbDevice): Boolean {
-//        device.productName?.let {
-//            if (it.contains("PC")) {
-//                return true
-//            }
-//        }
-        return true
+        bodyBinding.camera1.takePicture("aiImages", name)
     }
 
     override fun onImageSaved(result: IImageCapture.OutputFileResults) {
         result.savedUri?.path?.let {
             "onImageSaved->${it}".logi(TAG)
-
         }
     }
 
@@ -68,6 +58,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), OnUsbCameraSelectedLis
 
     override fun onDestroy() {
         super.onDestroy()
-        bodyBinding.camera.release()
+        bodyBinding {
+            camera1.cameraManager.release()
+        }
     }
 }

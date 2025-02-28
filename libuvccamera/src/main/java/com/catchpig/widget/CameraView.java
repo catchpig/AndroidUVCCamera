@@ -1,51 +1,54 @@
 package com.catchpig.widget;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
-import android.hardware.usb.UsbDevice;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.TextureView;
 
-import androidx.annotation.NonNull;
-
-import com.herohan.uvcapp.CameraHelper;
-import com.herohan.uvcapp.ICameraHelper;
+import com.catchpig.manager.CameraManager;
+import com.catchpig.uvccamera.R;
 import com.herohan.uvcapp.IImageCapture;
-import com.herohan.uvcapp.ImageCaptureConfig;
-import com.serenegiant.usb.Size;
 import com.serenegiant.widget.AspectRatioTextureView;
 
 import java.io.File;
-import java.util.List;
 
-public class CameraView extends AspectRatioTextureView implements TextureView.SurfaceTextureListener, ICameraHelper.StateCallback {
+public class CameraView extends AspectRatioTextureView {
     private static final String TAG = "CameraView";
-
-    private CameraHelper mCameraHelper;
-    private UsbDevice mUsbDevice;
-    private boolean mCameraOpened = false;
-    private OnUsbCameraSelectedListener mOnUsbCameraSelectedListener;
-    private IImageCapture.OnImageCaptureCallback mOnImageCaptureCallback;
+    private int mProductId;
+    private int mVendorId;
 
     public CameraView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public CameraView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public CameraView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        initAttr(context, attrs);
     }
 
-    public void setOnUsbCameraSelectedListener(OnUsbCameraSelectedListener onUsbCameraSelectedListener) {
-        mOnUsbCameraSelectedListener = onUsbCameraSelectedListener;
+    private void initAttr(Context context, AttributeSet attrs) {
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CameraView);
+        try {
+            mProductId = typedArray.getInt(R.styleable.CameraView_product_id, mProductId);
+            mVendorId = typedArray.getInt(R.styleable.CameraView_vendor_id, mVendorId);
+        } finally {
+            typedArray.recycle();
+        }
     }
 
-    public void setOnImageCaptureCallback(IImageCapture.OnImageCaptureCallback onImageCaptureCallback) {
-        mOnImageCaptureCallback = onImageCaptureCallback;
+    public void initCamera() {
+        getCameraManager().addTextureView(this);
+    }
+
+    public CameraManager getCameraManager() {
+        return CameraManager.getInstance(mProductId, mVendorId);
+    }
+
+    public void setOnImageCaptureCallback(IImageCapture.OnImageCaptureCallback captureCallback){
+        getCameraManager().setOnImageCaptureCallback(captureCallback);
     }
 
     /**
@@ -55,144 +58,19 @@ public class CameraView extends AspectRatioTextureView implements TextureView.Su
      * @param pictureName 照片名称(不带后缀)
      */
     public void takePicture(String folderName, String pictureName) {
-        if (mOnImageCaptureCallback == null) {
-            throw new IllegalArgumentException("请先设置照片回调的监听器(setOnImageCaptureCallback)");
-        }
-        CameraHelper cameraHelper = getCameraHelper();
         File outputDirectory = new File(getContext().getExternalCacheDir(), folderName);
         if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }
         File outputFile = new File(outputDirectory, String.format("%s.jpg", pictureName));
-        IImageCapture.OutputFileOptions options = new IImageCapture.OutputFileOptions.Builder(outputFile).build();
-        cameraHelper.takePicture(options, mOnImageCaptureCallback);
+        getCameraManager().takePicture(outputFile);
     }
 
-    /**
-     * 获取USB设备列表
-     *
-     * @return
-     */
-    public List<UsbDevice> getDeviceList() {
-        return getCameraHelper().getDeviceList();
+    public int getProductId() {
+        return mProductId;
     }
 
-    public CameraHelper getCameraHelper() {
-        if (mCameraHelper == null) {
-            mCameraHelper = new CameraHelper();
-            mCameraHelper.setStateCallback(this);
-            ImageCaptureConfig imageCaptureConfig = mCameraHelper.getImageCaptureConfig();
-            imageCaptureConfig.setJpegCompressionQuality(90);
-            mCameraHelper.setImageCaptureConfig(imageCaptureConfig);
-        }
-        return mCameraHelper;
-    }
-
-    public void setupCamera() {
-        setSurfaceTextureListener(this);
-    }
-
-    @Override
-    public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
-        getCameraHelper().addSurface(surface, false);
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
-
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
-        getCameraHelper().removeSurface(surface);
-        return false;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
-
-    }
-
-    public void closeCamera() {
-        if (mCameraOpened) {
-            getCameraHelper().closeCamera();
-        }
-    }
-
-    public void selectDevice(UsbDevice device) {
-        mUsbDevice = device;
-        mCameraOpened = false;
-        getCameraHelper().selectDevice(device);
-    }
-
-    @Override
-    public void onAttach(UsbDevice device) {
-        if (mOnUsbCameraSelectedListener != null) {
-            boolean result = mOnUsbCameraSelectedListener.onSelected(device);
-            if (result && mUsbDevice == null) {
-                selectDevice(device);
-            }
-        }
-    }
-
-    @Override
-    public void onDeviceOpen(UsbDevice device, boolean isFirstOpen) {
-        getCameraHelper().openCamera();
-    }
-
-    @Override
-    public void onCameraOpen(UsbDevice device) {
-        CameraHelper cameraHelper = getCameraHelper();
-        cameraHelper.startPreview();
-        Size size = cameraHelper.getPreviewSize();
-        if (size != null) {
-            setAspectRatio(size.width, size.height);
-        }
-        SurfaceTexture surfaceTexture = getSurfaceTexture();
-        if (surfaceTexture != null) {
-            cameraHelper.addSurface(surfaceTexture, false);
-        }
-        mCameraOpened = true;
-    }
-
-    @Override
-    public void onCameraClose(UsbDevice device) {
-        SurfaceTexture surfaceTexture = getSurfaceTexture();
-        if (surfaceTexture != null) {
-            getCameraHelper().addSurface(surfaceTexture, false);
-        }
-        mCameraOpened = false;
-    }
-
-    @Override
-    public void onDeviceClose(UsbDevice device) {
-        Log.d(TAG, "onDeviceClose");
-    }
-
-    @Override
-    public void onDetach(UsbDevice device) {
-        Log.d(TAG, "onDetach");
-        mUsbDevice = null;
-    }
-
-    @Override
-    public void onCancel(UsbDevice device) {
-        mUsbDevice = null;
-    }
-
-    public void release() {
-        if (mCameraHelper != null) {
-            mCameraHelper.release();
-        }
-    }
-
-    public interface OnUsbCameraSelectedListener {
-        /**
-         * 选择摄像头的回调
-         *
-         * @param device
-         * @return true:打开此摄像头显示画面 false:不显示此摄像头画面
-         */
-        boolean onSelected(UsbDevice device);
+    public int getVendorId() {
+        return mVendorId;
     }
 }

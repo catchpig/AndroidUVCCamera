@@ -4,23 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
+    <com.catchpig.widget.CameraView
+        android:id="@+id/camera1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#F44336"
-        app:layout_constraintBottom_toBottomOf="@id/camera"
-        app:layout_constraintEnd_toEndOf="@id/camera"
-        app:layout_constraintStart_toStartOf="@id/camera"
-        app:layout_constraintTop_toTopOf="@id/camera" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/camera2"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:product_id="8466"
+        app:vendor_id="3034" />
 
     <com.catchpig.widget.CameraView
-        android:id="@+id/camera"
+        android:id="@+id/camera2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/camera1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:product_id="25451"
+        app:vendor_id="3141" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/take_picture"
