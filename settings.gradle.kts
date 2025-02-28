@@ -12,13 +12,7 @@ pluginManagement {
         maven {
             url = uri("https://mirrors.cloud.tencent.com/repository/maven-public/")
         }
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
