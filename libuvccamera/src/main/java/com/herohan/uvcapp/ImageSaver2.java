@@ -102,13 +102,20 @@ public class ImageSaver2 implements Runnable {
 
     private byte[] imageToJpegByteArray(Bitmap image, int jpegQuality) {
         Bitmap bmp = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        byte[] byteArray = null;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
             bmp = Bitmap.createBitmap(image, 0, 0, mWidth, mHeight);
             bmp.compress(Bitmap.CompressFormat.JPEG, jpegQuality, out);
-            return out.toByteArray();
+            byteArray = out.toByteArray();
         } catch (Exception e) {
             Log.e(TAG, "failed to save file", e);
         } finally {
+            try {
+                out.close();
+            } catch (Exception e) {
+                Log.e(TAG, "failed to save file", e);
+            }
             if (bmp != null) {
                 bmp.recycle();
             }
@@ -116,7 +123,7 @@ public class ImageSaver2 implements Runnable {
                 image.recycle();
             }
         }
-        return null;
+        return byteArray;
     }
 
     private boolean isSaveToMediaStore() {

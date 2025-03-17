@@ -82,7 +82,7 @@ public class CameraManager implements ICameraHelper.StateCallback {
     }
 
 
-    public void addTextureView(CameraView cameraView) {
+    public void addCameraView(CameraView cameraView) {
         mCameraViews.add(cameraView);
         if (mCameraOpened) {
             addSurface(cameraView);
@@ -182,5 +182,9 @@ public class CameraManager implements ICameraHelper.StateCallback {
     public void onCancel(UsbDevice device) {
         Log.d(TAG, "onCancel");
         mUsbDevice = null;
+    }
+
+    public void removeCameraView(CameraView cameraView) {
+        mCameraViews.remove(cameraView);
     }
 }

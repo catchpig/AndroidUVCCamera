@@ -98,17 +98,29 @@ public class ImageSaver implements Runnable {
     }
 
     private byte[] imageToJpegByteArray(ImageRawData image, int jpegQuality) {
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            final Bitmap bmp = Bitmap.createBitmap(
+        Bitmap bmp = null;
+        byte[] byteArray = null;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            bmp = Bitmap.createBitmap(
                     image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
             bmp.copyPixelsFromBuffer(ByteBuffer.wrap(image.getData()));
             bmp.compress(Bitmap.CompressFormat.JPEG, jpegQuality, out);
             bmp.recycle();
-            return out.toByteArray();
+            byteArray = out.toByteArray();
         } catch (Exception e) {
             Log.e(TAG, "failed to save file", e);
+        } finally {
+            try {
+                out.close();
+            } catch (Exception e) {
+                Log.e(TAG, "failed to save file", e);
+            }
+            if (bmp != null) {
+                bmp.recycle();
+            }
         }
-        return null;
+        return byteArray;
     }
 
     private boolean isSaveToMediaStore() {

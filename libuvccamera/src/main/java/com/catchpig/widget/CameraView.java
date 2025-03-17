@@ -40,14 +40,14 @@ public class CameraView extends AspectRatioTextureView {
     }
 
     public void initCamera() {
-        getCameraManager().addTextureView(this);
+        getCameraManager().addCameraView(this);
     }
 
     public CameraManager getCameraManager() {
         return CameraManager.getInstance(mProductId, mVendorId);
     }
 
-    public void setOnImageCaptureCallback(IImageCapture.OnImageCaptureCallback captureCallback){
+    public void setOnImageCaptureCallback(IImageCapture.OnImageCaptureCallback captureCallback) {
         getCameraManager().setOnImageCaptureCallback(captureCallback);
     }
 
@@ -72,5 +72,11 @@ public class CameraView extends AspectRatioTextureView {
 
     public int getVendorId() {
         return mVendorId;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        getCameraManager().removeCameraView(this);
     }
 }
