@@ -3,5 +3,6 @@
     <declare-styleable name="CameraView">
         <attr name="product_id" format="integer" />
         <attr name="vendor_id" format="integer" />
+        <attr name="aspect_ratio" format="string" />
     </declare-styleable>
 </resources>
