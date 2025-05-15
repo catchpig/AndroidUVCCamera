@@ -13,8 +13,8 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:product_id="8466"
-        app:vendor_id="3034" />
+        app:product_id="45829"
+        app:vendor_id="40978" />
 
     <com.catchpig.widget.CameraView
         android:id="@+id/camera2"
