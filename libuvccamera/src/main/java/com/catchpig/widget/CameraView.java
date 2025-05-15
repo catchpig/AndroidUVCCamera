@@ -15,7 +15,6 @@ public class CameraView extends AspectRatioTextureView {
     private static final String TAG = "CameraView";
     private int mProductId;
     private int mVendorId;
-    private double mAspectRatio = 16 / (double) 9;
 
     public CameraView(Context context) {
         this(context, null);
@@ -28,7 +27,6 @@ public class CameraView extends AspectRatioTextureView {
     public CameraView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initAttr(context, attrs);
-        initView();
     }
 
     private void initAttr(Context context, AttributeSet attrs) {
@@ -36,18 +34,9 @@ public class CameraView extends AspectRatioTextureView {
         try {
             mProductId = typedArray.getInt(R.styleable.CameraView_product_id, mProductId);
             mVendorId = typedArray.getInt(R.styleable.CameraView_vendor_id, mVendorId);
-            String aspectRatio = typedArray.getString(R.styleable.CameraView_aspect_ratio);
-            if (aspectRatio != null) {
-                String[] array = aspectRatio.split(":");
-                mAspectRatio = Double.parseDouble(array[0]) / Double.parseDouble(array[1]);
-            }
         } finally {
             typedArray.recycle();
         }
-    }
-
-    private void initView() {
-        setAspectRatio(mAspectRatio);
     }
 
     public void initCamera() {

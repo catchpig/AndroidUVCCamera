@@ -6,15 +6,15 @@
 
     <com.catchpig.widget.CameraView
         android:id="@+id/camera1"
-        android:layout_width="960dp"
-        android:layout_height="540dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/camera2"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:aspect_ratio="16:9"
-        app:product_id="45829"
-        app:vendor_id="40978" />
+        app:product_id="8466"
+        app:vendor_id="3034" />
 
     <com.catchpig.widget.CameraView
         android:id="@+id/camera2"

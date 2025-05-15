@@ -145,6 +145,10 @@ public class CameraManager implements ICameraHelper.StateCallback {
     }
 
     private void addSurface(AspectRatioTextureView textureView) {
+        Size size = mCameraHelper.getPreviewSize();
+        if (size != null) {
+            textureView.setAspectRatio(size.width, size.height);
+        }
         SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
         if (surfaceTexture != null) {
             mCameraHelper.addSurface(surfaceTexture, false);
